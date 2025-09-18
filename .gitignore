@@ -1,0 +1,38 @@
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+
+# Drizzle-Kit files
+migrations/
+migrations-supabase/
+
+# dotenv environment variables file
+.env
+.env.*
+.env.*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# IDE directories
+.idea/
+.vscode/
+
+# Other
+.DS_Store
+*.tar.gz
+vite.config.ts.*
+
+# Python lock file
+uv.lock
+
+# Local state files from Replit
+.local/
+.replit
+replit.nix
+.config/

@@ -635,17 +635,8 @@ export type InsertDeliveryZone = z.infer<typeof insertDeliveryZoneSchema>;
 export type Expense = typeof expenses.$inferSelect;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
 
-export type Ingredient = typeof ingredients.$inferSelect;
-export type InsertIngredient = z.infer<typeof insertIngredientSchema>;
-
-export type ProductIngredient = typeof productIngredients.$inferSelect;
-export type InsertProductIngredient = z.infer<typeof insertProductIngredientSchema>;
-
-export type ProductAdditional = typeof productAdditionals.$inferSelect;
-export type InsertProductAdditional = z.infer<typeof insertProductAdditionalSchema>;
-
-export type OrderItemModification = typeof orderItemModifications.$inferSelect;
-export type InsertOrderItemModification = z.infer<typeof insertOrderItemModificationSchema>;
+export type ProductAttribute = typeof productAttributes.$inferSelect;
+export type InsertProductAttribute = z.infer<typeof insertProductAttributeSchema>;
 
 export type BannerTheme = typeof bannerThemes.$inferSelect;
 export type InsertBannerTheme = z.infer<typeof insertBannerThemeSchema>;

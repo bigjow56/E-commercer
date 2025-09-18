@@ -87,6 +87,11 @@ const createOrderRequestSchema = z.object({
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // === HEALTH CHECK ROUTE ===
+  app.get("/api", (req, res) => {
+    res.json({ status: "ok", message: "TechStore API running" });
+  });
+
   // === ADMIN LOGIN ROUTE (MUST BE FIRST - NO AUTH REQUIRED) ===
   app.post("/api/admin/login", authRateLimit, async (req, res) => {
     try {

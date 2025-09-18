@@ -202,6 +202,24 @@ export function AdminDeliveryZones() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
+              <Label className="text-base">Entrega Habilitada</Label>
+              <p className="text-sm text-muted-foreground">
+                Desabilitar todas as entregas da loja
+              </p>
+            </div>
+            <Switch
+              checked={!!storeSettings?.deliveryEnabled}
+              onCheckedChange={(checked) => {
+                updateStoreSettingsMutation.mutate({ deliveryEnabled: checked });
+              }}
+              data-testid="switch-delivery-enabled"
+            />
+          </div>
+
+          <Separator />
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
               <Label className="text-base">Taxa por Bairro</Label>
               <p className="text-sm text-muted-foreground">
                 Ativar cobrança diferenciada por bairro
@@ -211,6 +229,7 @@ export function AdminDeliveryZones() {
               checked={!!storeSettings?.useNeighborhoodDelivery}
               onCheckedChange={handleToggleNeighborhoodDelivery}
               data-testid="switch-neighborhood-delivery"
+              disabled={!storeSettings?.deliveryEnabled}
             />
           </div>
 
@@ -225,10 +244,11 @@ export function AdminDeliveryZones() {
                 onChange={(e) => handleUpdateDefaultFee(e.target.value)}
                 className="max-w-xs"
                 data-testid="input-default-fee"
+                disabled={!storeSettings?.deliveryEnabled}
               />
               <Button
                 onClick={handleSaveDefaultFee}
-                disabled={!hasUnsavedChanges || updateStoreSettingsMutation.isPending}
+                disabled={!hasUnsavedChanges || updateStoreSettingsMutation.isPending || !storeSettings?.deliveryEnabled}
                 size="sm"
                 data-testid="button-save-default-fee"
               >
@@ -236,9 +256,11 @@ export function AdminDeliveryZones() {
               </Button>
             </div>
             <p className="text-sm text-muted-foreground mt-1">
-              {storeSettings?.useNeighborhoodDelivery 
-                ? "Taxa aplicada quando o bairro não está na lista"
-                : "Taxa única aplicada para todas as entregas"
+              {!storeSettings?.deliveryEnabled 
+                ? "Entrega desabilitada - taxa não será aplicada"
+                : storeSettings?.useNeighborhoodDelivery 
+                  ? "Taxa aplicada quando o bairro não está na lista"
+                  : "Taxa única aplicada para todas as entregas"
               }
             </p>
           </div>
@@ -246,7 +268,7 @@ export function AdminDeliveryZones() {
       </Card>
 
       {/* Delivery Zones Management */}
-      {storeSettings?.useNeighborhoodDelivery && (
+      {storeSettings?.useNeighborhoodDelivery && storeSettings?.deliveryEnabled && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">

@@ -97,13 +97,14 @@ export const storeSettings = pgTable("store_settings", {
   closingTime: text("closing_time").default("23:00"),
   minimumOrderAmount: decimal("minimum_order_amount", { precision: 10, scale: 2 }).default("25.00"),
   deliveryAreas: jsonb("delivery_areas").default([]),
-  // Novos campos para taxa de entrega por bairro
+  // Configurações de entrega
+  deliveryEnabled: boolean("delivery_enabled").default(true),
   useNeighborhoodDelivery: boolean("use_neighborhood_delivery").default(false),
   defaultDeliveryFee: decimal("default_delivery_fee", { precision: 10, scale: 2 }).default("5.90"),
   
   // Banner principal (seção topo)
-  bannerTitle: text("banner_title").default("Hambúrguers"),
-  bannerDescription: text("banner_description").default("Ingredientes frescos, sabor incomparável."),
+  bannerTitle: text("banner_title").default("Tecnologia de Ponta"),
+  bannerDescription: text("banner_description").default("Inovação, qualidade e os melhores preços."),
   bannerPrice: decimal("banner_price", { precision: 10, scale: 2 }).default("18.90"),
   bannerImageUrl: text("banner_image_url").default(""),
   
@@ -118,7 +119,7 @@ export const storeSettings = pgTable("store_settings", {
   // Informações da loja (seção Nossa Loja)
   storeTitle: text("store_title").default("Nossa Loja"),
   // Nome da loja no cabeçalho
-  siteName: text("site_name").default("Burger House"),
+  siteName: text("site_name").default("TechStore"),
   storeImageUrl: text("store_image_url").default(""),
   storeAddress: text("store_address").default("Rua das Delícias, 123"),
   storeNeighborhood: text("store_neighborhood").default("Centro, São Paulo - SP"),
@@ -151,47 +152,47 @@ export const expenses = pgTable("expenses", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Ingredients/Additionals table
-export const ingredients = pgTable("ingredients", {
+// Inventory table - Sistema de estoque inteligente
+export const inventory = pgTable("inventory", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull(),
-  category: text("category").notNull(), // 'protein', 'cheese', 'vegetable', 'sauce', 'extra'
-  price: decimal("price", { precision: 10, scale: 2 }).notNull().default("0.00"), // preço adicional
-  discountPrice: decimal("discount_price", { precision: 10, scale: 2 }).default("0.00"), // desconto se removido
-  isRemovable: boolean("is_removable").default(true), // pode ser removido?
-  isRequired: boolean("is_required").default(false), // ingrediente obrigatório?
-  maxQuantity: integer("max_quantity").default(3), // quantidade máxima permitida
+  productId: varchar("product_id").references(() => products.id).notNull(),
+  currentStock: integer("current_stock").notNull().default(0),
+  minStock: integer("min_stock").notNull().default(5), // estoque mínimo para alerta
+  maxStock: integer("max_stock").notNull().default(100), // estoque máximo
+  reorderPoint: integer("reorder_point").notNull().default(10), // ponto de reposição
+  costPerUnit: decimal("cost_per_unit", { precision: 10, scale: 2 }).notNull().default("0.00"),
+  supplier: text("supplier"), // fornecedor
+  location: text("location"), // localização no estoque
+  lastRestocked: timestamp("last_restocked"),
   isActive: boolean("is_active").default(true),
+  notes: text("notes"), // observações sobre o produto
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Stock movements table - Movimentações de estoque
+export const stockMovements = pgTable("stock_movements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  inventoryId: varchar("inventory_id").references(() => inventory.id).notNull(),
+  type: text("type").notNull(), // 'in', 'out', 'adjustment', 'loss'
+  quantity: integer("quantity").notNull(),
+  reason: text("reason").notNull(), // motivo da movimentação
+  reference: text("reference"), // referência (ex: order_id, purchase_id)
+  unitCost: decimal("unit_cost", { precision: 10, scale: 2 }),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }),
+  performedBy: text("performed_by"), // usuário que fez a movimentação
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Product ingredients (base ingredients for each product)
-export const productIngredients = pgTable("product_ingredients", {
+// Product attributes table - Para características específicas de produtos eletrônicos
+export const productAttributes = pgTable("product_attributes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   productId: varchar("product_id").references(() => products.id).notNull(),
-  ingredientId: varchar("ingredient_id").references(() => ingredients.id).notNull(),
-  isIncludedByDefault: boolean("is_included_by_default").default(true),
-  quantity: integer("quantity").default(1),
-});
-
-// Product additionals (available additionals for each product)
-export const productAdditionals = pgTable("product_additionals", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  productId: varchar("product_id").references(() => products.id).notNull(),
-  ingredientId: varchar("ingredient_id").references(() => ingredients.id).notNull(),
-  customPrice: decimal("custom_price", { precision: 10, scale: 2 }), // preço específico para este produto (opcional)
+  attributeName: text("attribute_name").notNull(), // 'color', 'storage', 'RAM', 'processor', etc.
+  attributeValue: text("attribute_value").notNull(), // '128GB', '8GB', 'Preto', etc.
+  priceModifier: decimal("price_modifier", { precision: 10, scale: 2 }).default("0.00"), // modificação no preço
   isActive: boolean("is_active").default(true),
-});
-
-// Order item modifications (customizations applied to order items)
-export const orderItemModifications = pgTable("order_item_modifications", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  orderItemId: varchar("order_item_id").references(() => orderItems.id).notNull(),
-  ingredientId: varchar("ingredient_id").references(() => ingredients.id).notNull(),
-  modificationType: text("modification_type").notNull(), // 'add', 'remove', 'extra'
-  quantity: integer("quantity").default(1),
-  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Banner themes table
@@ -461,24 +462,27 @@ export const insertExpenseSchema = createInsertSchema(expenses).omit({
   date: z.string().or(z.date()).transform((val) => new Date(val)),
 });
 
-export const insertIngredientSchema = createInsertSchema(ingredients).omit({
+export const insertInventorySchema = createInsertSchema(inventory).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  costPerUnit: z.string().or(z.number()).transform((val) => val.toString()),
+});
+
+export const insertStockMovementSchema = createInsertSchema(stockMovements).omit({
   id: true,
   createdAt: true,
 }).extend({
-  price: z.string().or(z.number()).transform((val) => val.toString()),
-  discountPrice: z.string().or(z.number()).transform((val) => val.toString()),
+  unitCost: z.string().or(z.number()).transform((val) => val.toString()).optional(),
+  totalCost: z.string().or(z.number()).transform((val) => val.toString()).optional(),
 });
 
-export const insertProductIngredientSchema = createInsertSchema(productIngredients).omit({
+export const insertProductAttributeSchema = createInsertSchema(productAttributes).omit({
   id: true,
-});
-
-export const insertProductAdditionalSchema = createInsertSchema(productAdditionals).omit({
-  id: true,
-});
-
-export const insertOrderItemModificationSchema = createInsertSchema(orderItemModifications).omit({
-  id: true,
+  createdAt: true,
+}).extend({
+  priceModifier: z.string().or(z.number()).transform((val) => val.toString()),
 });
 
 export const insertBannerThemeSchema = createInsertSchema(bannerThemes).omit({

@@ -7,10 +7,9 @@ import {
   storeSettings,
   deliveryZones,
   expenses,
-  ingredients,
-  productIngredients,
-  productAdditionals,
-  orderItemModifications,
+  inventory,
+  stockMovements,
+  productAttributes,
   bannerThemes,
   loyaltyTransactions,
   loyaltyRewards,
@@ -35,14 +34,9 @@ import {
   type InsertDeliveryZone,
   type Expense,
   type InsertExpense,
-  type Ingredient,
-  type InsertIngredient,
-  type ProductIngredient,
-  type InsertProductIngredient,
-  type ProductAdditional,
-  type InsertProductAdditional,
-  type OrderItemModification,
-  type InsertOrderItemModification,
+  type InsertInventory,
+  type InsertStockMovement,
+  type InsertProductAttribute,
   type BannerTheme,
   type InsertBannerTheme,
   type LoyaltyTransaction,
@@ -674,117 +668,99 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Ingredients operations
-  async getIngredients(): Promise<Ingredient[]> {
+  // Inventory Management Functions
+  async getInventoryItems(): Promise<any[]> {
     return await db
-      .select()
-      .from(ingredients)
-      .where(eq(ingredients.isActive, true))
-      .orderBy(ingredients.category, ingredients.name);
+      .select({
+        id: inventory.id,
+        productId: inventory.productId,
+        currentStock: inventory.currentStock,
+        minStock: inventory.minStock,
+        maxStock: inventory.maxStock,
+        reorderPoint: inventory.reorderPoint,
+        costPerUnit: inventory.costPerUnit,
+        supplier: inventory.supplier,
+        location: inventory.location,
+        lastRestocked: inventory.lastRestocked,
+        isActive: inventory.isActive,
+        notes: inventory.notes,
+        createdAt: inventory.createdAt,
+        updatedAt: inventory.updatedAt,
+        product: {
+          id: products.id,
+          name: products.name,
+          description: products.description,
+          price: products.price,
+          categoryId: products.categoryId,
+          isAvailable: products.isAvailable
+        }
+      })
+      .from(inventory)
+      .leftJoin(products, eq(inventory.productId, products.id))
+      .where(eq(inventory.isActive, true))
+      .orderBy(products.name);
   }
 
-  async getIngredientsByCategory(category: string): Promise<Ingredient[]> {
-    return await db
-      .select()
-      .from(ingredients)
-      .where(and(
-        eq(ingredients.category, category),
-        eq(ingredients.isActive, true)
-      ))
-      .orderBy(ingredients.name);
+  async getInventoryItem(id: string): Promise<any | undefined> {
+    const [item] = await db.select().from(inventory).where(eq(inventory.id, id));
+    return item;
   }
 
-  async getIngredient(id: string): Promise<Ingredient | undefined> {
-    const [ingredient] = await db.select().from(ingredients).where(eq(ingredients.id, id));
-    return ingredient;
+  async createInventoryItem(inventoryData: InsertInventory): Promise<any> {
+    const [item] = await db.insert(inventory).values(inventoryData).returning();
+    return item;
   }
 
-  async createIngredient(ingredientData: InsertIngredient): Promise<Ingredient> {
-    const [ingredient] = await db.insert(ingredients).values(ingredientData).returning();
-    return ingredient;
-  }
-
-  async updateIngredient(id: string, ingredientData: Partial<InsertIngredient>): Promise<Ingredient | undefined> {
-    const [ingredient] = await db
-      .update(ingredients)
-      .set(ingredientData)
-      .where(eq(ingredients.id, id))
+  async updateInventoryItem(id: string, inventoryData: Partial<InsertInventory>): Promise<any | undefined> {
+    const [item] = await db
+      .update(inventory)
+      .set({ ...inventoryData, updatedAt: new Date() })
+      .where(eq(inventory.id, id))
       .returning();
-    return ingredient;
+    return item;
   }
 
-  async deleteIngredient(id: string): Promise<boolean> {
-    const result = await db.delete(ingredients).where(eq(ingredients.id, id));
+  async deleteInventoryItem(id: string): Promise<boolean> {
+    const result = await db.delete(inventory).where(eq(inventory.id, id));
     return (result.rowCount ?? 0) > 0;
   }
 
-  // Product Ingredients & Additionals operations
-  async getProductIngredients(productId: string): Promise<ProductIngredient[]> {
+  // Stock Movement Functions
+  async getStockMovements(inventoryId?: string): Promise<any[]> {
+    const query = db.select().from(stockMovements);
+    if (inventoryId) {
+      return await query.where(eq(stockMovements.inventoryId, inventoryId)).orderBy(desc(stockMovements.createdAt));
+    }
+    return await query.orderBy(desc(stockMovements.createdAt));
+  }
+
+  async createStockMovement(movementData: InsertStockMovement): Promise<any> {
+    const [movement] = await db.insert(stockMovements).values(movementData).returning();
+    return movement;
+  }
+
+  // Product inventory tracking operations
+  async getProductInventoryStatus(productId: string): Promise<any[]> {
+    // Get current stock status for a specific product
     return await db
-      .select({
-        id: productIngredients.id,
-        productId: productIngredients.productId,
-        ingredientId: productIngredients.ingredientId,
-        isIncludedByDefault: productIngredients.isIncludedByDefault,
-        quantity: productIngredients.quantity,
-        customPrice: productAdditionals.customPrice, // Buscar customPrice dos additionals
-        ingredient: ingredients
-      })
-      .from(productIngredients)
-      .leftJoin(ingredients, eq(productIngredients.ingredientId, ingredients.id))
-      .leftJoin(productAdditionals, and(
-        eq(productIngredients.productId, productAdditionals.productId),
-        eq(productIngredients.ingredientId, productAdditionals.ingredientId)
-      ))
-      .where(eq(productIngredients.productId, productId));
+      .select()
+      .from(inventory)
+      .where(eq(inventory.productId, productId));
   }
 
-  async getProductAdditionals(productId: string): Promise<ProductAdditional[]> {
-    return await db
-      .select({
-        id: productAdditionals.id,
-        productId: productAdditionals.productId,
-        ingredientId: productAdditionals.ingredientId,
-        customPrice: productAdditionals.customPrice,
-        isActive: productAdditionals.isActive,
-        ingredient: ingredients
-      })
-      .from(productAdditionals)
-      .leftJoin(ingredients, eq(productAdditionals.ingredientId, ingredients.id))
-      .where(and(
-        eq(productAdditionals.productId, productId),
-        eq(productAdditionals.isActive, true)
-      ));
+  // Placeholder for product variations/options (replacing additionals)
+  async getProductOptions(productId: string): Promise<any[]> {
+    // For electronics, product options could be colors, storage sizes, etc.
+    return [];
   }
 
-  async addProductIngredient(data: InsertProductIngredient): Promise<ProductIngredient> {
-    const [productIngredient] = await db.insert(productIngredients).values(data).returning();
-    return productIngredient;
+  // Product attribute management for electronics
+  async addProductAttribute(data: any): Promise<any> {
+    // Future implementation for product specs/attributes
+    return data;
   }
 
-  async addProductAdditional(data: InsertProductAdditional): Promise<ProductAdditional> {
-    const [productAdditional] = await db.insert(productAdditionals).values(data).returning();
-    return productAdditional;
-  }
-
-  async removeProductIngredient(productId: string, ingredientId: string): Promise<boolean> {
-    const result = await db
-      .delete(productIngredients)
-      .where(and(
-        eq(productIngredients.productId, productId),
-        eq(productIngredients.ingredientId, ingredientId)
-      ));
-    return (result.rowCount ?? 0) > 0;
-  }
-
-  async removeProductAdditional(productId: string, ingredientId: string): Promise<boolean> {
-    const result = await db
-      .delete(productAdditionals)
-      .where(and(
-        eq(productAdditionals.productId, productId),
-        eq(productAdditionals.ingredientId, ingredientId)
-      ));
-    return (result.rowCount ?? 0) > 0;
-  }
+  // Remove old ingredient/additional functions - not needed for electronics store
 
   async updateProductIngredients(productId: string, ingredientConfigs: any[]): Promise<void> {
     // Only update ingredients if ingredientConfigs is provided and not empty

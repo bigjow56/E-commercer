@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertOrderSchema, insertOrderItemSchema, insertProductSchema, insertDeliveryZoneSchema, insertCategorySchema, insertExpenseSchema, insertIngredientSchema, insertProductIngredientSchema, insertProductAdditionalSchema, insertBannerThemeSchema, insertLoyaltyRewardSchema, insertLoyaltyRedemptionSchema, insertSeasonalRewardSchema, insertPointsRuleSchema, insertLoyaltyTiersConfigSchema, insertCampaignSchema, insertWebhookConfigSchema, insertWebhookEventSchema } from "@shared/schema";
+import { insertUserSchema, insertOrderSchema, insertOrderItemSchema, insertProductSchema, insertDeliveryZoneSchema, insertCategorySchema, insertExpenseSchema, insertInventorySchema, insertStockMovementSchema, insertBannerThemeSchema, insertLoyaltyRewardSchema, insertLoyaltyRedemptionSchema, insertSeasonalRewardSchema, insertPointsRuleSchema, insertLoyaltyTiersConfigSchema, insertCampaignSchema, insertWebhookConfigSchema, insertWebhookEventSchema } from "@shared/schema";
 import { z } from "zod";
 import { notifyProductChange } from "./webhook";
 import { requireAuth, requireAdmin, authRateLimit, adminRateLimit, generateToken } from "./auth";
@@ -986,81 +986,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Ingredients Routes
-  app.get("/api/ingredients", async (req, res) => {
+  // Inventory Management Routes
+  app.get("/api/inventory", async (req, res) => {
     try {
-      const { category } = req.query;
-      let ingredients;
-      
-      if (category && typeof category === 'string') {
-        ingredients = await storage.getIngredientsByCategory(category);
-      } else {
-        ingredients = await storage.getIngredients();
-      }
-      
-      res.json(ingredients);
+      const inventory = await storage.getInventoryItems();
+      res.json(inventory);
     } catch (error) {
-      console.error("Error fetching ingredients:", error);
-      res.status(500).json({ message: "Failed to fetch ingredients" });
+      console.error("Error fetching inventory:", error);
+      res.status(500).json({ message: "Failed to fetch inventory" });
     }
   });
 
-  app.post("/api/ingredients", async (req, res) => {
+  app.post("/api/inventory", async (req, res) => {
     try {
-      const ingredientData = insertIngredientSchema.parse(req.body);
-      const ingredient = await storage.createIngredient(ingredientData);
-      res.status(201).json(ingredient);
+      const inventoryData = insertInventorySchema.parse(req.body);
+      const item = await storage.createInventoryItem(inventoryData);
+      res.status(201).json(item);
     } catch (error) {
-      console.error("Error creating ingredient:", error);
+      console.error("Error creating inventory item:", error);
       if (error instanceof z.ZodError) {
-        res.status(400).json({ message: "Invalid ingredient data", errors: error.errors });
+        res.status(400).json({ message: "Invalid inventory data", errors: error.errors });
       } else {
-        res.status(500).json({ message: "Failed to create ingredient" });
+        res.status(500).json({ message: "Failed to create inventory item" });
       }
     }
   });
 
-  app.put("/api/ingredients/:id", async (req, res) => {
+  app.put("/api/inventory/:id", async (req, res) => {
     try {
-      const ingredientData = insertIngredientSchema.partial().parse(req.body);
-      const ingredient = await storage.updateIngredient(req.params.id, ingredientData);
-      if (!ingredient) {
-        return res.status(404).json({ message: "Ingredient not found" });
+      const inventoryData = insertInventorySchema.partial().parse(req.body);
+      const item = await storage.updateInventoryItem(req.params.id, inventoryData);
+      if (!item) {
+        return res.status(404).json({ message: "Inventory item not found" });
       }
-      res.json(ingredient);
+      res.json(item);
     } catch (error) {
-      console.error("Error updating ingredient:", error);
+      console.error("Error updating inventory item:", error);
       if (error instanceof z.ZodError) {
-        res.status(400).json({ message: "Invalid ingredient data", errors: error.errors });
+        res.status(400).json({ message: "Invalid inventory data", errors: error.errors });
       } else {
-        res.status(500).json({ message: "Failed to update ingredient" });
+        res.status(500).json({ message: "Failed to update inventory item" });
       }
     }
   });
 
-  app.delete("/api/ingredients/:id", async (req, res) => {
+  app.delete("/api/inventory/:id", async (req, res) => {
     try {
-      const success = await storage.deleteIngredient(req.params.id);
+      const success = await storage.deleteInventoryItem(req.params.id);
       if (!success) {
-        return res.status(404).json({ message: "Ingredient not found" });
+        return res.status(404).json({ message: "Inventory item not found" });
       }
-      res.json({ message: "Ingredient deleted successfully" });
+      res.json({ message: "Inventory item deleted successfully" });
     } catch (error) {
-      console.error("Error deleting ingredient:", error);
-      res.status(500).json({ message: "Failed to delete ingredient" });
+      console.error("Error deleting inventory item:", error);
+      res.status(500).json({ message: "Failed to delete inventory item" });
     }
   });
 
-  app.get("/api/ingredients/:id", async (req, res) => {
+  app.get("/api/inventory/:id", async (req, res) => {
     try {
-      const ingredient = await storage.getIngredient(req.params.id);
-      if (!ingredient) {
-        return res.status(404).json({ message: "Ingredient not found" });
+      const item = await storage.getInventoryItem(req.params.id);
+      if (!item) {
+        return res.status(404).json({ message: "Inventory item not found" });
       }
-      res.json(ingredient);
+      res.json(item);
     } catch (error) {
-      console.error("Error fetching ingredient:", error);
-      res.status(500).json({ message: "Failed to fetch ingredient" });
+      console.error("Error fetching inventory item:", error);
+      res.status(500).json({ message: "Failed to fetch inventory item" });
+    }
+  });
+
+  // Stock movements API endpoints
+  app.get("/api/stock-movements", async (req, res) => {
+    try {
+      const { inventoryId } = req.query;
+      const movements = await storage.getStockMovements(inventoryId as string);
+      res.json(movements);
+    } catch (error) {
+      console.error("Error fetching stock movements:", error);
+      res.status(500).json({ message: "Failed to fetch stock movements" });
+    }
+  });
+
+  app.post("/api/stock-movements", async (req, res) => {
+    try {
+      const movementData = insertStockMovementSchema.parse(req.body);
+      const movement = await storage.createStockMovement(movementData);
+      res.status(201).json(movement);
+    } catch (error) {
+      console.error("Error creating stock movement:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid stock movement data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create stock movement" });
+      }
     }
   });
 

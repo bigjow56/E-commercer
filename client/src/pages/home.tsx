@@ -11,16 +11,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useCart } from "@/hooks/use-cart";
 import { useState } from "react";
 import { CATEGORIES } from "@/lib/constants";
-import { Search, Sandwich, EggFried, Coffee, IceCream, Box, Tags } from "lucide-react";
+import { Search, Smartphone, Laptop, Headphones, Tablet, Watch, Tags } from "lucide-react";
 import type { Product, Category, StoreSettings } from "@shared/schema";
 
 const CATEGORY_ICONS = {
-  hamburgers: Sandwich,
-  sides: EggFried,
-  drinks: Coffee,
-  desserts: IceCream,
-  combos: Box,
-  promotions: Tags,
+  smartphones: Smartphone,
+  computadores: Laptop,
+  acessorios: Headphones,
+  tablets: Tablet,
+  smartwatch: Watch,
+  promocoes: Tags,
 };
 
 export default function Home() {
@@ -152,7 +152,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                🍔 Nosso Cardápio
+                📱 Nossos Produtos
               </h2>
               
               <div className="relative hidden md:block">
@@ -175,12 +175,12 @@ export default function Home() {
                 className="flex-shrink-0 whitespace-nowrap"
                 data-testid="category-all"
               >
-                <Sandwich className="mr-2 h-4 w-4" />
+                <Smartphone className="mr-2 h-4 w-4" />
                 Todos
               </Button>
               
               {categories.map((category) => {
-                const Icon = CATEGORY_ICONS[category.slug as keyof typeof CATEGORY_ICONS] || Sandwich;
+                const Icon = CATEGORY_ICONS[category.slug as keyof typeof CATEGORY_ICONS] || Smartphone;
                 return (
                   <Button
                     key={category.id}

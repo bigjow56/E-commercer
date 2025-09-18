@@ -165,9 +165,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     'POST:/api/expenses',
     'PUT:/api/expenses/*', 
     'DELETE:/api/expenses/*',
-    'POST:/api/ingredients',
-    'PUT:/api/ingredients/*',
-    'DELETE:/api/ingredients/*',
+    'POST:/api/inventory',
+    'PUT:/api/inventory/*',
+    'DELETE:/api/inventory/*',
     'POST:/api/banners',
     'PUT:/api/banners/*',
     'DELETE:/api/banners/*'

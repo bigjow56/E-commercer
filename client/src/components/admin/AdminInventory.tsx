@@ -90,8 +90,9 @@ export function AdminInventory() {
   // Filtrar itens baseado na busca e filtro de estoque
   const filteredItems = inventoryItems.filter(item => {
     const productName = item.product?.name || products.find(p => p.id === item.productId)?.name || '';
+    const supplier = item.supplier?.toLowerCase() || '';
     const matchesSearch = productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.supplier?.toLowerCase().includes(searchTerm.toLowerCase());
+                         supplier.includes(searchTerm.toLowerCase());
     
     const matchesFilter = stockFilter === "all" || 
                          (stockFilter === "low" && item.currentStock <= item.minStock) ||
@@ -125,7 +126,10 @@ export function AdminInventory() {
             Gerencie o estoque dos seus produtos com alertas automáticos
           </p>
         </div>
-        <Button>
+        <Button onClick={() => {
+          // TODO: Implementar modal de criação de item de inventário
+          toast({ title: "Funcionalidade em desenvolvimento", description: "A criação de itens será implementada em breve." });
+        }}>
           <Plus className="mr-2 h-4 w-4" />
           Adicionar Item
         </Button>

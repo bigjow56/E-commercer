@@ -20,21 +20,21 @@ export default function HeroSection({ storeSettings, onScrollToMenu }: HeroSecti
   const minimumOrder = storeSettings?.minimumOrderAmount ?? "25.00";
 
   // Use banner ativo se existir, senão use configurações antigas
-  const bannerTitle = activeBanner?.title || storeSettings?.bannerTitle || "Tecnologia";
-  const bannerDescription = activeBanner?.description || storeSettings?.bannerDescription || "Inovação, qualidade e os melhores preços.";
-  const bannerPrice = activeBanner?.price || storeSettings?.bannerPrice || "899.90";
-  const bannerImageUrl = activeBanner?.imageUrl || storeSettings?.bannerImageUrl || "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600";
+  const bannerTitle = activeBanner?.title || storeSettings?.bannerTitle || "Hambúrgueres";
+  const bannerDescription = activeBanner?.description || storeSettings?.bannerDescription || "Os melhores hambúrgueres artesanais da cidade. Entrega rápida e ingredientes frescos!";
+  const bannerPrice = activeBanner?.price || storeSettings?.bannerPrice || "24.90";
+  const bannerImageUrl = activeBanner?.imageUrl || storeSettings?.bannerImageUrl || "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600";
   
   // Configurações de aparência do banner - usar banner ativo se disponível
-  const bannerColor1 = activeBanner?.gradientColor1 || storeSettings?.bannerColor1 || "#3b82f6";
-  const bannerColor2 = activeBanner?.gradientColor2 || storeSettings?.bannerColor2 || "#1d4ed8";
-  const bannerColor3 = activeBanner?.gradientColor3 || storeSettings?.bannerColor3 || "#1e40af";
-  const bannerColor4 = activeBanner?.gradientColor4 || storeSettings?.bannerColor4 || "#2563eb";
+  const bannerColor1 = activeBanner?.gradientColor1 || storeSettings?.bannerColor1 || "#dc2626";
+  const bannerColor2 = activeBanner?.gradientColor2 || storeSettings?.bannerColor2 || "#ea580c";
+  const bannerColor3 = activeBanner?.gradientColor3 || storeSettings?.bannerColor3 || "#f59e0b";
+  const bannerColor4 = activeBanner?.gradientColor4 || storeSettings?.bannerColor4 || "#eab308";
   const bannerBackgroundImage = storeSettings?.bannerBackgroundImage; // Mantém do sistema antigo por enquanto
   const useImageBackground = activeBanner?.useBackgroundImage || storeSettings?.bannerUseImageBackground || false;
   
   const openWhatsApp = () => {
-    const message = "Olá! Gostaria de saber mais sobre os produtos da TechStore.";
+    const message = "Olá! Gostaria de fazer um pedido de hambúrguer. Vocês fazem entrega?";
     const phone = "5511999999999"; // Replace with actual WhatsApp number
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
   };
@@ -127,8 +127,8 @@ export default function HeroSection({ storeSettings, onScrollToMenu }: HeroSecti
       </div>
       
       {/* Decorative elements */}
-      <div className="absolute top-10 right-10 text-6xl opacity-10">📱</div>
-      <div className="absolute bottom-20 left-10 text-4xl opacity-10">🗺️</div>
+      <div className="absolute top-10 right-10 text-6xl opacity-10">🍔</div>
+      <div className="absolute bottom-20 left-10 text-4xl opacity-10">🚚</div>
     </section>
   );
 }

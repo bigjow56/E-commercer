@@ -95,24 +95,24 @@ export const storeSettings = pgTable("store_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   isOpen: boolean("is_open").default(true),
   closingTime: text("closing_time").default("23:00"),
-  minimumOrderAmount: decimal("minimum_order_amount", { precision: 10, scale: 2 }).default("25.00"),
+  minimumOrderAmount: decimal("minimum_order_amount", { precision: 10, scale: 2 }).default("199.00"),
   deliveryAreas: jsonb("delivery_areas").default([]),
   // Configurações de entrega
   deliveryEnabled: boolean("delivery_enabled").default(true),
   useNeighborhoodDelivery: boolean("use_neighborhood_delivery").default(false),
-  defaultDeliveryFee: decimal("default_delivery_fee", { precision: 10, scale: 2 }).default("5.90"),
+  defaultDeliveryFee: decimal("default_delivery_fee", { precision: 10, scale: 2 }).default("19.90"),
   
   // Banner principal (seção topo)
-  bannerTitle: text("banner_title").default("Tecnologia de Ponta"),
-  bannerDescription: text("banner_description").default("Inovação, qualidade e os melhores preços."),
-  bannerPrice: decimal("banner_price", { precision: 10, scale: 2 }).default("18.90"),
+  bannerTitle: text("banner_title").default("Smartphones Premium"),
+  bannerDescription: text("banner_description").default("Os melhores preços em eletrônicos e tecnologia. Garantia oficial e entrega rápida."),
+  bannerPrice: decimal("banner_price", { precision: 10, scale: 2 }).default("899.90"),
   bannerImageUrl: text("banner_image_url").default(""),
   
   // Personalização visual do banner
-  bannerColor1: text("banner_color_1").default("#ff6b35"),
-  bannerColor2: text("banner_color_2").default("#f7931e"),
-  bannerColor3: text("banner_color_3").default("#ffd23f"),
-  bannerColor4: text("banner_color_4").default("#ff8c42"),
+  bannerColor1: text("banner_color_1").default("#0ea5e9"),
+  bannerColor2: text("banner_color_2").default("#3b82f6"),
+  bannerColor3: text("banner_color_3").default("#6366f1"),
+  bannerColor4: text("banner_color_4").default("#7c3aed"),
   bannerBackgroundImage: text("banner_background_image"),
   bannerUseImageBackground: boolean("banner_use_image_background").default(false),
   
@@ -121,12 +121,12 @@ export const storeSettings = pgTable("store_settings", {
   // Nome da loja no cabeçalho
   siteName: text("site_name").default("TechStore"),
   storeImageUrl: text("store_image_url").default(""),
-  storeAddress: text("store_address").default("Rua das Delícias, 123"),
+  storeAddress: text("store_address").default("Av. da Tecnologia, 123"),
   storeNeighborhood: text("store_neighborhood").default("Centro, São Paulo - SP"),
-  storeHours: text("store_hours").default("Segunda a Sexta: 18h - 23h\nSábado e Domingo: 18h - 00h"),
-  deliveryTime: text("delivery_time").default("Tempo médio: 30-45 minutos"),
-  deliveryFeeRange: text("delivery_fee_range").default("Taxa: R$ 3,90 - R$ 8,90"),
-  paymentMethods: text("payment_methods").default("Dinheiro, Cartão, PIX\nMercado Pago integrado"),
+  storeHours: text("store_hours").default("Atendimento Online 24h\nLoja física: Segunda a Sábado: 9h - 18h"),
+  deliveryTime: text("delivery_time").default("Entrega em 24-48h úteis"),
+  deliveryFeeRange: text("delivery_fee_range").default("Frete: R$ 9,90 - R$ 19,90"),
+  paymentMethods: text("payment_methods").default("Cartão de Crédito, PIX, Boleto\nPagamento seguro e parcelado"),
   
   updatedAt: timestamp("updated_at").defaultNow(),
 });

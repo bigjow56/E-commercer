@@ -1,6 +1,7 @@
 import { db } from './db';
-import { categories, products, storeSettings } from '@shared/schema';
+import { categories, products, storeSettings, adminUsers } from '@shared/schema';
 import { eq, sql } from 'drizzle-orm';
+import { hashPassword } from './auth';
 
 export async function seedDatabase() {
   try {
@@ -217,10 +218,27 @@ export async function seedDatabase() {
       });
     }
 
+    // Verificar se já existe usuário admin
+    const existingAdmin = await db.select().from(adminUsers).limit(1);
+    
+    if (existingAdmin.length === 0) {
+      // Criar usuário administrador padrão
+      const hashedPassword = await hashPassword('admin123');
+      await db.insert(adminUsers).values({
+        username: 'admin',
+        email: 'admin@techstore.com',
+        password: hashedPassword,
+        role: 'admin',
+        isActive: true,
+      });
+      console.log('👤 Usuário administrador criado (username: admin, senha: admin123)');
+    }
+
     console.log('✅ Banco de dados populado com sucesso!');
     console.log('📦 Criadas 5 categorias de tecnologia');
     console.log('📱 Criados 12 produtos tecnológicos');
     console.log('⚙️ Configurações da loja inicializadas');
+    console.log('👤 Usuário admin verificado/criado');
     
   } catch (error) {
     console.error('❌ Erro ao popular banco de dados:', error);

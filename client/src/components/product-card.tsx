@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
+import { Link } from "wouter";
 import type { Product } from "@shared/schema";
 
 interface ProductCardProps {
@@ -33,77 +34,81 @@ export default function ProductCard({ product, onAddToCart, showBadge = false }:
     <Card className={`overflow-hidden transition-all duration-300 group ${
       isAvailable ? 'hover:shadow-xl hover:scale-105' : 'opacity-75'
     }`}>
-      <div className="relative overflow-hidden">
-        <img 
-          src={product.imageUrl} 
-          alt={product.name} 
-          className={`w-full h-32 sm:h-40 md:h-48 object-cover transition-transform duration-500 ${
-            isAvailable ? 'group-hover:scale-110' : 'grayscale'
-          }`} 
-        />
-        <div className={`absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 ${
-          isAvailable ? 'group-hover:opacity-100' : ''
-        }`}></div>
+      <Link href={`/produto/${product.id}`}>
+        <div className="relative overflow-hidden cursor-pointer">
+          <img 
+            src={product.imageUrl} 
+            alt={product.name} 
+            className={`w-full h-32 sm:h-40 md:h-48 object-cover transition-transform duration-500 ${
+              isAvailable ? 'group-hover:scale-110' : 'grayscale'
+            }`} 
+          />
+          <div className={`absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 ${
+            isAvailable ? 'group-hover:opacity-100' : ''
+          }`}></div>
         
-        {showBadge && (
-          <div className="absolute top-2 right-2 z-10">
-            <div className="relative animate-float">
-              <div className="bg-gradient-to-r from-red-500 via-orange-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-glow">
-                <div className="flex items-center space-x-1">
-                  <span className="text-yellow-300">⭐</span>
-                  <span>MAIS VENDIDO</span>
+          {showBadge && (
+            <div className="absolute top-2 right-2 z-10">
+              <div className="relative animate-float">
+                <div className="bg-gradient-to-r from-red-500 via-orange-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-glow">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-yellow-300">⭐</span>
+                    <span>MAIS VENDIDO</span>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-orange-500 to-red-600 rounded-full blur opacity-75"></div>
+              </div>
+            </div>
+          )}
+        
+          {hasDiscount && (
+            <div className="absolute top-2 left-2 z-10">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-2 py-1 rounded-lg text-xs font-bold shadow-lg transform rotate-[-8deg]">
+                <div className="flex flex-col items-center">
+                  <span className="text-yellow-300 text-xs">💰</span>
+                  <span>{discountPercent}% OFF</span>
                 </div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-orange-500 to-red-600 rounded-full blur opacity-75"></div>
             </div>
-          </div>
-        )}
+          )}
         
-        {hasDiscount && (
-          <div className="absolute top-2 left-2 z-10">
-            <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-2 py-1 rounded-lg text-xs font-bold shadow-lg transform rotate-[-8deg]">
-              <div className="flex flex-col items-center">
-                <span className="text-yellow-300 text-xs">💰</span>
-                <span>{discountPercent}% OFF</span>
+          {product.isPromotion && !hasDiscount && isAvailable && (
+            <div className="absolute top-2 left-2 z-10">
+              <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-bounce">
+                <div className="flex items-center space-x-1">
+                  <span>🏷️</span>
+                  <span>OFERTA</span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
         
-        {product.isPromotion && !hasDiscount && isAvailable && (
-          <div className="absolute top-2 left-2 z-10">
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-bounce">
-              <div className="flex items-center space-x-1">
-                <span>🏷️</span>
-                <span>OFERTA</span>
+          {!isAvailable && (
+            <div className="absolute top-2 right-2 z-10">
+              <div className="bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg opacity-90">
+                <div className="flex items-center space-x-1">
+                  <span>😞</span>
+                  <span>ESGOTADO</span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
         
-        {!isAvailable && (
-          <div className="absolute top-2 right-2 z-10">
-            <div className="bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg opacity-90">
-              <div className="flex items-center space-x-1">
-                <span>😞</span>
-                <span>ESGOTADO</span>
+          {/* Badge de urgência para produtos em promoção */}
+          {(hasDiscount || product.isPromotion) && isAvailable && (
+            <div className="absolute bottom-2 left-2 z-10">
+              <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow-lg animate-shake">
+                <span>⚡ Últimas unidades</span>
               </div>
             </div>
-          </div>
-        )}
-        
-        {/* Badge de urgência para produtos em promoção */}
-        {(hasDiscount || product.isPromotion) && isAvailable && (
-          <div className="absolute bottom-2 left-2 z-10">
-            <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow-lg animate-shake">
-              <span>⚡ Últimas unidades</span>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </Link>
       
       <CardContent className="p-3 sm:p-4 md:p-6">
-        <h3 className="text-sm sm:text-base md:text-xl font-semibold text-card-foreground mb-1 sm:mb-2 line-clamp-1">{product.name}</h3>
+        <Link href={`/produto/${product.id}`}>
+          <h3 className="text-sm sm:text-base md:text-xl font-semibold text-card-foreground mb-1 sm:mb-2 line-clamp-1 hover:text-orange-600 cursor-pointer transition-colors">{product.name}</h3>
+        </Link>
         
         {/* Avaliações com estrelas */}
         <div className="flex items-center mb-2">

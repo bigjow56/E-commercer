@@ -321,6 +321,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single product by ID
+  app.get("/api/products/:id", async (req, res) => {
+    try {
+      const productId = req.params.id;
+      const product = await storage.getProduct(productId);
+      
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      
+      res.json(product);
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      res.status(500).json({ message: "Failed to fetch product" });
+    }
+  });
+
   // Store settings
   app.get("/api/store/settings", async (req, res) => {
     try {
@@ -1096,16 +1113,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching product ingredients:", error);
       res.status(500).json({ message: "Failed to fetch product ingredients" });
-    }
-  });
-
-  app.get("/api/products/:id/additionals", async (req, res) => {
-    try {
-      const additionals = await storage.getProductAdditionals(req.params.id);
-      res.json(additionals);
-    } catch (error) {
-      console.error("Error fetching product additionals:", error);
-      res.status(500).json({ message: "Failed to fetch product additionals" });
     }
   });
 

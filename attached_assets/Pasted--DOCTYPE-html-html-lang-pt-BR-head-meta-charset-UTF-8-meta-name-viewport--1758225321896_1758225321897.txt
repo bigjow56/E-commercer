@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacBook Air M3 13" - TechStore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background: #f7fafc;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2d3748;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 1rem 0;
+        }
+
+        .breadcrumb-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #4299e1;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .product-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Image Gallery */
+        .image-gallery {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+
+        .main-image:hover {
+            transform: scale(1.02);
+        }
+
+        .thumbnail-gallery {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail.active {
+            border-color: #4299e1;
+        }
+
+        .thumbnail:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Product Info */
+        .product-info h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #f6ad55;
+            font-size: 1.2rem;
+        }
+
+        .rating-info {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #e53e3e;
+            margin: 1rem 0;
+        }
+
+        .price-old {
+            color: #718096;
+            text-decoration: line-through;
+            font-size: 1.2rem;
+            margin-left: 1rem;
+        }
+
+        .description {
+            color: #4a5568;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .features {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .features h3 {
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .features ul {
+            list-style: none;
+            space-y: 0.5rem;
+        }
+
+        .features li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+
+        .features li::before {
+            content: '✓';
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .options {
+            margin-bottom: 2rem;
+        }
+
+        .option-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .option-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .option-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            border-color: #4299e1;
+            background: #ebf8ff;
+        }
+
+        .option-btn.selected {
+            border-color: #4299e1;
+            background: #4299e1;
+            color: white;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .quantity-btn {
+            padding: 0.8rem 1rem;
+            background: #f7fafc;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 0.8rem;
+            border: none;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 1.2rem 2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(66, 153, 225, 0.4);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: white;
+            color: #4299e1;
+            border: 2px solid #4299e1;
+            padding: 1.2rem 2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary:hover {
+            background: #4299e1;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .delivery-info {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .delivery-info h4 {
+            color: #22543d;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .delivery-info ul {
+            list-style: none;
+            color: #2f855a;
+        }
+
+        .delivery-info li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .delivery-info li::before {
+            content: '🚚';
+        }
+
+        /* Tabs Section */
+        .tabs-section {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tabs-nav {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: #4299e1;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #4299e1;
+        }
+
+        .tab-content {
+            padding: 2rem;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Specifications Table */
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .specs-table th,
+        .specs-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .specs-table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+            width: 30%;
+        }
+
+        .specs-table tr:hover {
+            background: #f7fafc;
+        }
+
+        /* Reviews */
+        .review {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1.5rem 0;
+        }
+
+        .review:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .review-author {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .review-date {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .review-rating {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-text {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-section {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .product-info h1 {
+                font-size: 2rem;
+            }
+
+            .price {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .tabs-nav {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                flex: auto;
+                min-width: 50%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container > * {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .floating-buy-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(66, 153, 225, 0.4);
+            display: none;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .floating-buy-btn.visible {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .floating-buy-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">TechStore</div>
+            <div>🛒 <span id="cartCount">0</span></div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="#">Início</a> > <a href="#">Computadores</a> > <a href="#">Laptops</a> > <strong>MacBook Air M3 13"</strong>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Product Section -->
+        <section class="product-section">
+            <!-- Image Gallery -->
+            <div class="image-gallery">
+                <div class="main-image" id="mainImage">
+                    💻
+                </div>
+                <div class="thumbnail-gallery">
+                    <div class="thumbnail active">💻</div>
+                    <div class="thumbnail">⌨️</div>
+                    <div class="thumbnail">🖥️</div>
+                    <div class="thumbnail">📦</div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="product-info">
+                <h1>MacBook Air M3 13"</h1>
+                
+                <div class="rating">
+                    <div class="stars">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">☆</span>
+                    </div>
+                    <span class="rating-info">(4.9) • 1.247 avaliações</span>
+                </div>
+
+                <div class="price">
+                    R$ 9.999,00
+                    <span class="price-old">R$ 11.999,00</span>
+                </div>
+
+                <div class="description">
+                    O novo MacBook Air de 13 polegadas com chip M3 redefine a portabilidade e performance. 
+                    Com até 18 horas de bateria, design ultrafino e a potência do chip Apple M3, 
+                    é perfeito para trabalho, estudo e criação.
+                </div>
+
+                <div class="features">
+                    <h3>Principais Características</h3>
+                    <ul>
+                        <li>Chip Apple M3 com CPU de 8 núcleos</li>
+                        <li>GPU de até 10 núcleos</li>
+                        <li>16GB de memória unificada</li>
+                        <li>SSD de 256GB ultrarrápido</li>
+                        <li>Tela Liquid Retina de 13,6"</li>
+                        <li>Até 18 horas de duração de bateria</li>
+                    </ul>
+                </div>
+
+                <div class="options">
+                    <div class="option-group">
+                        <label class="option-label">Cor:</label>
+                        <div class="option-buttons">
+                            <button class="option-btn selected">Prateado</button>
+                            <button class="option-btn">Space Gray</button>
+                            <button class="option-btn">Dourado</button>
+                            <button class="option-btn">Azul Meia-noite</button>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-label">Armazenamento:</label>
+                        <div class="option-buttons">
+                            <button class="option-btn selected">256GB (+R$ 0)</button>
+                            <button class="option-btn">512GB (+R$ 2.000)</button>
+                            <button class="option-btn">1TB (+R$ 4.000)</button>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-label">Memória:</label>
+                        <div class="option-buttons">
+                            <button class="option-btn selected">8GB (+R$ 0)</button>
+                            <button class="option-btn">16GB (+R$ 2.000)</button>
+                            <button class="option-btn">24GB (+R$ 4.000)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quantity">
+                    <label>Quantidade:</label>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" class="quantity-input" value="1" min="1" id="quantity">
+                        <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-primary" onclick="addToCart()">
+                        🛒 Adicionar ao Carrinho
+                    </button>
+                    <button class="btn-secondary" onclick="buyNow()">
+                        ⚡ Comprar Agora
+                    </button>
+                </div>
+
+                <div class="delivery-info">
+                    <h4>🚚 Informações de Entrega</h4>
+                    <ul>
+                        <li>Entrega rápida em até 2 dias úteis</li>
+                        <li>Frete grátis para todo o Brasil</li>
+                        <li>Garantia Apple de 1 ano</li>
+                        <li>Suporte técnico especializado</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabs Section -->
+        <section class="tabs-section">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" onclick="showTab('specs')">Especificações</button>
+                <button class="tab-btn" onclick="showTab('reviews')">Avaliações</button>
+                <button class="tab-btn" onclick="showTab('shipping')">Entrega</button>
+                <button class="tab-btn" onclick="showTab('support')">Suporte</button>
+            </nav>
+
+            <div class="tab-content">
+                <!-- Specifications Tab -->
+                <div id="specs" class="tab-pane active">
+                    <h3>Especificações Técnicas</h3>
+                    <table class="specs-table">
+                        <tr>
+                            <th>Processador</th>
+                            <td>Chip Apple M3 com CPU de 8 núcleos (4 de performance e 4 de eficiência)</td>
+                        </tr>
+                        <tr>
+                            <th>GPU</th>
+                            <td>GPU de 8 núcleos (10 núcleos no modelo de 512GB)</td>
+                        </tr>
+                        <tr>
+                            <th>Neural Engine</th>
+                            <td>Neural Engine de 16 núcleos</td>
+                        </tr>
+                        <tr>
+                            <th>Memória</th>
+                            <td>8GB, 16GB ou 24GB de memória unificada</td>
+                        </tr>
+                        <tr>
+                            <th>Armazenamento</th>
+                            <td>SSD de 256GB, 512GB, 1TB ou 2TB</td>
+                        </tr>
+                        <tr>
+                            <th>Tela</th>
+                            <td>Liquid Retina de 13,6" (diagonal) LED com tecnologia IPS</td>
+                        </tr>
+                        <tr>
+                            <th>Resolução</th>
+                            <td>2.560 x 1.664 pixels com 224 ppi</td>
+                        </tr>
+                        <tr>
+                            <th>Bateria</th>
+                            <td>Até 18 horas de reprodução de vídeo</td>
+                        </tr>
+                        <tr>
+                            <th>Conectividade</th>
+                            <td>Wi-Fi 6E, Bluetooth 5.3, 2x Thunderbolt/USB 4</td>
+                        </tr>
+                        <tr>
+                            <th>Câmera</th>
+                            <td>Câmera FaceTime HD de 1080p</td>
+                        </tr>
+                        <tr>
+                            <th>Áudio</th>
+                            <td>Sistema de som de quatro alto-falantes com Áudio Espacial</td>
+                        </tr>
+                        <tr>
+                            <th>Dimensões</th>
+                            <td>30,41 cm x 21,5 cm x 1,13 cm</td>
+                        </tr>
+                        <tr>
+                            <th>Peso</th>
+                            <td>1,24 kg</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Reviews Tab -->
+                <div id="reviews" class="tab-pane">
+                    <h3>Avaliações dos Clientes</h3>
+                    
+                    <div class="review">
+                        <div class="review-header">
+                            <div class="review-author">Carlos Silva</div>
+                            <div class="review-date">15 de Janeiro, 2024</div>
+                        </div>
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-text">
+                            Excepcional! A performance do M3 é impressionante, especialmente para desenvolvimento. 
+                            A bateria realmente dura o dia todo e o design é lindísimo. Vale cada centavo!
+                        </div>
+                    </div>
+
+                    <div class="review">
+                        <div class="review-header">
+                            <div class="review-author">Ana Costa</div>
+                            <div class="review-date">12 de Janeiro, 2024</div>
+                        </div>
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">☆</span>
+                        </div>
+                        <div class="review-text">
+                            Produto incrível para design gráfico. A tela Liquid Retina tem cores muito vibrantes. 
+                            Único ponto negativo é o preço dos upgrades de armazenamento, mas fora isso, perfeito!
+                        </div>
+                    </div>
+
+                    <div class="review">
+                        <div class="review-header">
+                            <div class="review-author">Roberto Martins</div>
+                            <div class="review-date">10 de Janeiro, 2024</div>
+                        </div>
+                        <div class="review-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <div class="review-text">
+                            Migrei do Intel e a diferença é gritante! Muito mais rápido, silencioso e eficiente. 
+                            A qualidade de build da Apple continua exemplar. Recomendo demais!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Tab -->
+                <div id="shipping" class="tab-pane">
+                    <h3>Informações de Entrega</h3>
+                    <div style="padding: 1rem 0;">
+                        <h4 style="margin-bottom: 1rem;">🚚 Opções de Entrega</h4>
+                        <ul style="margin-bottom: 2rem;">
+                            <li><strong>Entrega Expressa:</strong> 1-2 dias úteis (Grátis)</li>
+                            <li><strong>Entrega Padrão:</strong> 3-5 dias úteis (Grátis)</li>
+                            <li><strong>Retirada na Loja:</strong> Disponível em algumas cidades</li>
+                        </ul>
+                        
+                        <h4 style="margin-bottom: 1rem;">📦 Política de Devolução</h4>
+                        <ul>
+                            <li>30 dias para devolução sem custo</li>
+                            <li>Produto deve estar na embalagem original</li>
+                            <li>Reembolso integral ou troca</li>
+                            <li>Coleta gratuita em caso de defeito</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Support Tab -->
+                <div id="support" class="tab-pane">
+                    <h3>Suporte e Garantia</h3>
+                    <div style="padding: 1rem 0;">
+                        <h4 style="margin-bottom: 1rem;">🛡️ Garantia</h4>
+                        <ul style="margin-bottom: 2rem;">
+                            <li><strong>Garantia Apple:</strong> 1 ano contra defeitos de fabricação</li>
+                            <li><strong>Garantia Estendida:</strong> Disponível por 2 anos adicionais</li>
+                            <li><strong>AppleCare+:</strong> Cobertura completa incluindo acidentes</li>
+                        </ul>
+                        
+                        <h4 style="margin-bottom: 1rem;">📞 Suporte Técnico</h4>
+                        <ul>
+                            <li>Chat online 24/7</li>
+                            <li>Suporte via telefone: 0800-123-4567</li>
+                            <li>Email: suporte@techstore.com</li>
+                            <li>Assistência técnica autorizada Apple</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Floating Buy Button -->
+    <button class="floating-buy-btn" id="floatingBtn" onclick="addToCart()">
+        🛒 Adicionar ao Carrinho - R$ 9.999,00
+    </button>
+
+    <script>
+        let cartCount = 0;
+
+        function changeQuantity(delta) {
+            const quantityInput = document.getElementById('quantity');
+            let quantity = parseInt(quantityInput.value) + delta;
+            if (quantity < 1) quantity = 1;
+            quantityInput.value = quantity;
+        }
+
+        function addToCart() {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            cartCount += quantity;
+            document.getElementById('cartCount').textContent = cartCount;
+            
+            // Show success animation
+            alert(`${quantity}x MacBook Air M3 13" adicionado ao carrinho!`);
+        }
+
+        function buyNow() {
+            alert('Redirecionando para checkout...');
+        }
+
+        function showTab(tabName) {
+            // Hide all tab panes
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList

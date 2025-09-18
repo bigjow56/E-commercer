@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,31 +48,49 @@ export function AdminInventory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [stockFilter, setStockFilter] = useState("all");
 
-  // Buscar produtos para criar itens de estoque
-  const { data: products = [] } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
+  // Buscar dados reais de inventário da API
+  const { data: inventoryItems = [], isLoading, refetch } = useQuery<InventoryItem[]>({
+    queryKey: ["/api/inventory"],
+    queryFn: () => fetch("/api/inventory").then((res) => res.json()),
   });
 
-  // Mock data para demonstração (substituir por API real)
-  const inventoryItems: InventoryItem[] = products.map((product, index) => ({
-    id: `inv-${product.id}`,
-    productId: product.id,
-    currentStock: Math.floor(Math.random() * 100),
-    minStock: 5,
-    maxStock: 100,
-    reorderPoint: 10,
-    costPerUnit: (parseFloat(product.price) * 0.6).toFixed(2),
-    supplier: index % 3 === 0 ? "Fornecedor A" : index % 3 === 1 ? "Fornecedor B" : null,
-    location: `Estoque ${String.fromCharCode(65 + (index % 3))}`,
-    lastRestocked: null,
-    isActive: true,
-    notes: null,
-    product: product
-  }));
+  // Buscar produtos para referência
+  const { data: products = [] } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
+    queryFn: () => fetch("/api/products").then((res) => res.json()),
+  });
+
+  // Mutations para operações CRUD
+  const createInventoryMutation = useMutation({
+    mutationFn: (data: Partial<InventoryItem>) => 
+      fetch("/api/inventory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then((res) => res.json()),
+    onSuccess: () => {
+      refetch();
+      toast({ title: "Item criado com sucesso!" });
+    },
+  });
+
+  const updateInventoryMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<InventoryItem> }) =>
+      fetch(`/api/inventory/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then((res) => res.json()),
+    onSuccess: () => {
+      refetch();
+      toast({ title: "Item atualizado com sucesso!" });
+    },
+  });
 
   // Filtrar itens baseado na busca e filtro de estoque
   const filteredItems = inventoryItems.filter(item => {
-    const matchesSearch = item.product?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const productName = item.product?.name || products.find(p => p.id === item.productId)?.name || '';
+    const matchesSearch = productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.supplier?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesFilter = stockFilter === "all" || 

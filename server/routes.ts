@@ -42,7 +42,7 @@ const createWebhookConfigSchema = insertWebhookConfigSchema.extend({
 const updateWebhookConfigSchema = createWebhookConfigSchema.partial();
 
 const webhookNotificationSchema = z.object({
-  tableName: z.enum(["products", "ingredients", "categories"]),
+  tableName: z.enum(["products", "inventory", "categories"]),
   operationType: z.enum(["INSERT", "UPDATE", "DELETE"]),
   recordId: z.string().min(1),
   oldData: z.any().optional(),

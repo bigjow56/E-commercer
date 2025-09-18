@@ -10,6 +10,28 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-09-18: Páginas Individuais de Produtos Implementadas
+
+**Sistema Completo de Visualização de Produtos:**
+- **Página Individual de Produto**: Nova rota `/produto/:id` para visualização detalhada
+- **Galeria de Imagens**: Interface com imagem principal e thumbnails para navegação
+- **Opções de Personalização**: Sistema para seleção de modificações e personalizações
+- **Integração com Carrinho**: Funcionalidade completa para adicionar produtos ao carrinho
+- **Design Responsivo**: Interface otimizada para desktop e mobile
+
+**Funcionalidades Implementadas:**
+- **Endpoint API**: `GET /api/products/:id` para buscar dados individuais de produtos
+- **Componente ProductPage**: Interface completa com tabs para descrição, especificações e avaliações
+- **Navegação por Links**: Todos os cartões de produtos agora direcionam para suas páginas individuais
+- **Breadcrumb Navigation**: Sistema de navegação com categorias e hierarquia
+- **Correção de Bugs**: Resolução de conflitos de rotas duplicadas que causavam erro 404
+
+**Arquitetura Implementada:**
+- **Frontend**: Componente `ProductPage` em `/client/src/pages/product.tsx`
+- **Backend**: Endpoint dedicado em `/server/routes.ts` para busca individual
+- **Roteamento**: Integração com Wouter para rota dinâmica `/produto/:id`
+- **Estado**: Uso do TanStack Query para gerenciamento de dados do produto
+
 ### 2025-01-07: Painel Administrativo do Sistema de Fidelidade Implementado
 
 **Sistema Completo de Admin:**

@@ -65,16 +65,17 @@ const createOrderRequestSchema = z.object({
   specialInstructions: z.string().optional(),
   items: z.array(z.object({
     productId: z.string(),
-    quantity: z.number().min(1),
-    unitPrice: z.string(),
+    quantity: z.number().int().min(1), // SECURITY: Integer only, no fractions
+    // SECURITY: Removed unitPrice - server calculates prices from database
     modifications: z.array(z.object({
       ingredientId: z.string(),
       ingredientName: z.string(),
       modificationType: z.enum(['add', 'remove', 'extra']),
-      quantity: z.number().default(1),
-      unitPrice: z.number(),
+      quantity: z.number().int().default(1), // SECURITY: Integer only
+      // SECURITY: Removed unitPrice - server uses safe default prices
     })).optional().default([]),
-  })),
+  }).strict()), // SECURITY: Reject unknown fields
+
 }).refine((data) => {
   // If delivery type is "delivery", address fields are required
   if (data.deliveryType === "delivery") {
@@ -406,17 +407,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       console.log("🔥🔥🔥 FIM DOS LOGS DE DEBUG 🔥🔥🔥");
       
-      // Calculate totals and get product names
+      // Calculate totals and get product names - USE SERVER PRICES, NOT CLIENT PRICES!
       let subtotal = 0;
+      
+      // First, validate all products exist
+      for (const item of requestData.items) {
+        const product = await storage.getProduct(item.productId);
+        if (!product) {
+          return res.status(404).json({ message: `Produto não encontrado: ${item.productId}` });
+        }
+      }
+      
+      // Then calculate prices with validated products
       const orderItems = await Promise.all(requestData.items.map(async item => {
         const product = await storage.getProduct(item.productId);
-        const totalPrice = parseFloat(item.unitPrice) * item.quantity;
+        // Product is guaranteed to exist now
+        const actualUnitPrice = parseFloat(product!.price);
+        const totalPrice = actualUnitPrice * item.quantity;
         subtotal += totalPrice;
+        
         return {
           productId: item.productId,
-          productName: product?.name || 'Produto não encontrado',
+          productName: product!.name,
           quantity: item.quantity,
-          unitPrice: item.unitPrice,
+          unitPrice: actualUnitPrice.toFixed(2),
           totalPrice: totalPrice.toFixed(2),
         };
       }));
@@ -474,14 +488,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const orderItem = createdOrderItems[i];
         
         if (requestItem.modifications && requestItem.modifications.length > 0) {
+          // SECURITY: For now, modifications are free (price = 0.00)
+          // This prevents client price manipulation while we implement proper ingredient pricing
           const modifications = requestItem.modifications.map(mod => {
-            const totalPrice = mod.unitPrice * mod.quantity;
+            const safeIngredientPrice = 0.00; // Free modifications for now
+            const totalPrice = safeIngredientPrice * mod.quantity;
+            
             return {
               orderItemId: orderItem.id,
               ingredientId: mod.ingredientId,
               modificationType: mod.modificationType,
               quantity: mod.quantity,
-              unitPrice: mod.unitPrice.toString(),
+              unitPrice: safeIngredientPrice.toString(),
               totalPrice: totalPrice.toString(),
             };
           });
@@ -544,7 +562,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               personalizacoes: requestItem.modifications.map(mod => ({
                 acao: mod.modificationType === 'remove' ? 'remover' : 'adicionar',
                 ingrediente: mod.ingredientName,
-                preco: mod.modificationType === 'remove' ? 0 : mod.unitPrice,
+                preco: 0.00, // SECURITY: Fixed price, no client manipulation
                 quantidade: mod.quantity
               }))
             };

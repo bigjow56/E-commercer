@@ -90,7 +90,10 @@ export function AdminUsers() {
   const { data: searchedUsers } = useQuery<User[]>({
     queryKey: ['/api/admin/search-users', userSearchTerm],
     enabled: userSearchTerm.length > 2,
-    queryFn: () => apiRequest(`/api/admin/search-users?q=${encodeURIComponent(userSearchTerm)}`),
+    queryFn: async () => {
+      const response = await apiRequest(`/api/admin/search-users?q=${encodeURIComponent(userSearchTerm)}`);
+      return await response.json();
+    },
   });
 
   // Mutation for updating redemption status

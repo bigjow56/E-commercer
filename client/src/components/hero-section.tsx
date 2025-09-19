@@ -26,10 +26,10 @@ export default function HeroSection({ storeSettings, onScrollToMenu }: HeroSecti
   const bannerImageUrl = activeBanner?.imageUrl || storeSettings?.bannerImageUrl || "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600";
   
   // Configurações de aparência do banner - usar banner ativo se disponível
-  const bannerColor1 = activeBanner?.gradientColor1 || storeSettings?.bannerColor1 || "#0ea5e9";
-  const bannerColor2 = activeBanner?.gradientColor2 || storeSettings?.bannerColor2 || "#3b82f6";
-  const bannerColor3 = activeBanner?.gradientColor3 || storeSettings?.bannerColor3 || "#6366f1";
-  const bannerColor4 = activeBanner?.gradientColor4 || storeSettings?.bannerColor4 || "#7c3aed";
+  const bannerColor1 = activeBanner?.gradientColor1 || storeSettings?.bannerColor1 || "#1e40af";
+  const bannerColor2 = activeBanner?.gradientColor2 || storeSettings?.bannerColor2 || "#1d4ed8";
+  const bannerColor3 = activeBanner?.gradientColor3 || storeSettings?.bannerColor3 || "#1e3a8a";
+  const bannerColor4 = activeBanner?.gradientColor4 || storeSettings?.bannerColor4 || "#0f172a";
   const bannerBackgroundImage = storeSettings?.bannerBackgroundImage; // Mantém do sistema antigo por enquanto
   const useImageBackground = activeBanner?.useBackgroundImage || storeSettings?.bannerUseImageBackground || false;
   

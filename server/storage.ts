@@ -2,6 +2,7 @@ import {
   users,
   categories,
   products,
+  productImages,
   orders,
   orderItems,
   storeSettings,
@@ -472,6 +473,57 @@ export class DatabaseStorage implements IStorage {
       .delete(products)
       .where(eq(products.id, id));
     return (result.rowCount || 0) > 0;
+  }
+
+  // Product Images Operations
+  async getProductImages(productId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(productImages)
+      .where(eq(productImages.productId, productId))
+      .orderBy(productImages.displayOrder, productImages.createdAt);
+  }
+
+  async addProductImage(imageData: any): Promise<any> {
+    const [image] = await db.insert(productImages).values(imageData).returning();
+    return image;
+  }
+
+  async updateProductImage(imageId: string, updateData: any): Promise<any | undefined> {
+    const [image] = await db
+      .update(productImages)
+      .set(updateData)
+      .where(eq(productImages.id, imageId))
+      .returning();
+    return image;
+  }
+
+  async deleteProductImage(imageId: string): Promise<boolean> {
+    const result = await db
+      .delete(productImages)
+      .where(eq(productImages.id, imageId));
+    return (result.rowCount || 0) > 0;
+  }
+
+  async setMainProductImage(productId: string, imageId: string): Promise<boolean> {
+    try {
+      // First, remove main flag from all images of this product
+      await db
+        .update(productImages)
+        .set({ isMain: false })
+        .where(eq(productImages.productId, productId));
+      
+      // Then set the specified image as main
+      const result = await db
+        .update(productImages)
+        .set({ isMain: true })
+        .where(and(eq(productImages.id, imageId), eq(productImages.productId, productId)));
+      
+      return (result.rowCount || 0) > 0;
+    } catch (error) {
+      console.error("Error setting main product image:", error);
+      return false;
+    }
   }
 
   // Helper function to generate unique order number

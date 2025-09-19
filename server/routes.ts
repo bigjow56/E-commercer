@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertOrderSchema, insertOrderItemSchema, insertProductSchema, insertDeliveryZoneSchema, insertCategorySchema, insertExpenseSchema, insertInventorySchema, insertStockMovementSchema, insertBannerThemeSchema, insertLoyaltyRewardSchema, insertLoyaltyRedemptionSchema, insertSeasonalRewardSchema, insertPointsRuleSchema, insertLoyaltyTiersConfigSchema, insertCampaignSchema, insertWebhookConfigSchema, insertWebhookEventSchema } from "@shared/schema";
+import { insertUserSchema, insertOrderSchema, insertOrderItemSchema, insertProductSchema, insertDeliveryZoneSchema, insertCategorySchema, insertExpenseSchema, insertInventorySchema, insertStockMovementSchema, insertBannerThemeSchema, insertLoyaltyRewardSchema, insertLoyaltyRedemptionSchema, insertSeasonalRewardSchema, insertPointsRuleSchema, insertLoyaltyTiersConfigSchema, insertCampaignSchema, insertWebhookConfigSchema, insertWebhookEventSchema, insertProductImageSchema } from "@shared/schema";
 import { z } from "zod";
 import { notifyProductChange } from "./webhook";
 import { requireAuth, requireAdmin, authRateLimit, adminRateLimit, generateToken } from "./auth";
@@ -163,6 +163,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     'DELETE:/api/products/*',
     'POST:/api/products/*/recalculate-price',
     'POST:/api/products/recalculate-all-prices',
+    'POST:/api/products/*/images',
+    'PUT:/api/product-images/*',
+    'DELETE:/api/product-images/*',
+    'PUT:/api/products/*/main-image/*',
     'DELETE:/api/orders/*',
     'POST:/api/delivery-zones',
     'PUT:/api/delivery-zones/*',
@@ -194,8 +198,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (method !== routeMethod) return false;
       
       if (path.includes('*')) {
-        const basePath = path.replace('/*', '');
-        return routePath.startsWith(basePath);
+        // Convert wildcard pattern to regex
+        // Replace * with [^/]+ (match any non-slash characters)
+        // Handle trailing /* as prefix match
+        let regexPattern;
+        if (path.endsWith('/*')) {
+          // Trailing /* means match everything under this path
+          regexPattern = path.replace(/\/\*$/, '').replace(/\*/g, '[^/]+') + '(/.*)?$';
+        } else {
+          // Exact wildcard matching
+          regexPattern = '^' + path.replace(/\*/g, '[^/]+') + '$';
+        }
+        
+        const regex = new RegExp(regexPattern);
+        return regex.test(routePath);
       }
       return routePath === path;
     });
@@ -793,6 +809,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting product:", error);
       res.status(500).json({ message: "Failed to delete product" });
+    }
+  });
+
+  // === PRODUCT IMAGES ROUTES ===
+
+  // Get all images for a product
+  app.get("/api/products/:id/images", async (req, res) => {
+    try {
+      const productId = req.params.id;
+      const images = await storage.getProductImages(productId);
+      res.json(images);
+    } catch (error) {
+      console.error("Error fetching product images:", error);
+      res.status(500).json({ message: "Failed to fetch product images" });
+    }
+  });
+
+  // Add a new image to a product
+  app.post("/api/products/:id/images", async (req, res) => {
+    try {
+      const productId = req.params.id;
+      const imageData = insertProductImageSchema.parse({
+        productId,
+        ...req.body
+      });
+      
+      const image = await storage.addProductImage(imageData);
+      res.status(201).json(image);
+    } catch (error) {
+      console.error("Error adding product image:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid image data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to add product image" });
+      }
+    }
+  });
+
+  // Update image order or properties
+  app.put("/api/product-images/:imageId", async (req, res) => {
+    try {
+      const imageId = req.params.imageId;
+      const updateData = req.body;
+      
+      const image = await storage.updateProductImage(imageId, updateData);
+      if (!image) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+      
+      res.json(image);
+    } catch (error) {
+      console.error("Error updating product image:", error);
+      res.status(500).json({ message: "Failed to update product image" });
+    }
+  });
+
+  // Delete a product image
+  app.delete("/api/product-images/:imageId", async (req, res) => {
+    try {
+      const imageId = req.params.imageId;
+      const success = await storage.deleteProductImage(imageId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting product image:", error);
+      res.status(500).json({ message: "Failed to delete product image" });
+    }
+  });
+
+  // Set main image for a product
+  app.put("/api/products/:id/main-image/:imageId", async (req, res) => {
+    try {
+      const { id: productId, imageId } = req.params;
+      const success = await storage.setMainProductImage(productId, imageId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Image or product not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error setting main image:", error);
+      res.status(500).json({ message: "Failed to set main image" });
     }
   });
 

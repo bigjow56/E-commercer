@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Produtos - TechStore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            z-index: 1;
+        }
+
+        .input-with-icon input {
+            padding-left: 40px;
+        }
+
+        .price-input {
+            position: relative;
+        }
+
+        .currency {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .price-input input {
+            padding-left: 35px;
+        }
+
+        .category-selector {
+            position: relative;
+        }
+
+        .category-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .category-tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tag-remove {
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .tag-remove:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .add-category-btn {
+            background: #27ae60;
+            color: white;
+            border: 2px dashed transparent;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .add-category-btn:hover {
+            background: #229954;
+            transform: scale(1.02);
+        }
+
+        .image-upload {
+            border: 2px dashed #bdc3c7;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .image-upload:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .image-upload.dragover {
+            border-color: #667eea;
+            background: #f0f5ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #bdc3c7;
+            margin-bottom: 1rem;
+        }
+
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .main-image-indicator {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: #f39c12;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #f0f5ff;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .attributes-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .attribute-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 10px;
+        }
+
+        .add-attribute-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .remove-attribute-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 2rem;
+            border-top: 1px solid #e9ecef;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .quick-actions {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+
+        .quick-actions h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .quick-action-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 2px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .seo-section {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+        }
+
+        .inventory-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .promotion-section {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .form-section {
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        .form-section:nth-child(1) { animation-delay: 0.1s; }
+        .form-section:nth-child(2) { animation-delay: 0.2s; }
+        .form-section:nth-child(3) { animation-delay: 0.3s; }
+
+        @media (max-width: 968px) {
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📦 Gerenciar Produtos</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <strong>14</strong> Produtos
+                </div>
+                <div class="stat-item">
+                    <strong>R$ 89.430</strong> Valor Total
+                </div>
+                <div class="stat-item">
+                    <strong>12</strong> Disponíveis
+                </div>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            ✅ Produto salvo com sucesso!
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            ❌ Erro ao salvar produto. Verifique os campos obrigatórios.
+        </div>
+
+        <div class="form-container">
+            <!-- Seção Principal -->
+            <div class="main-content">
+                <!-- Informações Básicas -->
+                <div class="form-section">
+                    <h3 class="section-title">📝 Informações Básicas</h3>
+                    
+                    <div class="form-group">
+                        <label class="required">Nome do Produto</label>
+                        <input type="text" id="productName" placeholder="Ex: iPhone 15 Pro 128GB" value="iPhone 15 Pro 128GB">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">SKU</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">🏷️</span>
+                                <input type="text" id="sku" placeholder="SKU único" value="IP15P-128-BLK">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Marca</label>
+                            <select id="brand">
+                                <option value="">Selecione a marca</option>
+                                <option value="apple" selected>Apple</option>
+                                <option value="samsung">Samsung</option>
+                                <option value="xiaomi">Xiaomi</option>
+                                <option value="google">Google</option>
+                                <option value="oneplus">OnePlus</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Descrição</label>
+                        <textarea id="description" placeholder="Descreva o produto em detalhes...">Apple iPhone 15 Pro 128GB, câmera Pro de 48MP, chip A17 Pro, tela Super Retina XDR de 6,1"</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição Detalhada</label>
+                        <textarea id="detailedDescription" rows="6" placeholder="Descrição completa com especificações técnicas, recursos, benefícios..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Categorias -->
+                <div class="form-section">
+                    <h3 class="section-title">📁 Categorias</h3>
+                    
+                    <div class="form-group">
+                        <label class="required">Categoria Principal</label>
+                        <select id="mainCategory">
+                            <option value="">Selecione a categoria</option>
+                            <option value="smartphones" selected>Smartphones</option>
+                            <option value="laptops">Laptops</option>
+                            <option value="tablets">Tablets</option>
+                            <option value="acessorios">Acessórios</option>
+                            <option value="smartwatch">SmartWatch</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subcategorias</label>
+                        <select id="subcategory" multiple>
+                            <option value="premium">Premium</option>
+                            <option value="gaming">Gaming</option>
+                            <option value="profissional">Profissional</option>
+                            <option value="basico">Básico</option>
+                        </select>
+                    </div>
+
+                    <div class="category-tags" id="categoryTags">
+                        <div class="category-tag">
+                            Smartphones <span class="tag-remove" onclick="removeTag(this)">×</span>
+                        </div>
+                        <div class="category-tag">
+                            Premium <span class="tag-remove" onclick="removeTag(this)">×</span>
+                        </div>
+                    </div>
+                    
+                    <button class="add-category-btn" type="button" onclick="openCategoryModal()">
+                        + Criar Nova Categoria
+                    </button>
+                </div>
+
+                <!-- Preços e Estoque -->
+                <div class="form-section">
+                    <h3 class="section-title">💰 Preços e Estoque</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">Preço de Venda</label>
+                            <div class="price-input">
+                                <span class="currency">R$</span>
+                                <input type="number" id="price" step="0.01" placeholder="0,00" value="8999.00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Preço Original</label>
+                            <div class="price-input">
+                                <span class="currency">R$</span>
+                                <input type="number" id="originalPrice" step="0.01" placeholder="0,00" value="9999.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">Quantidade em Estoque</label>
+                            <input type="number" id="stock" placeholder="0" value="25">
+                        </div>
+                        <div class="form-group">
+                            <label>Estoque Mínimo</label>
+                            <input type="number" id="minStock" placeholder="0" value="5">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Peso (kg)</label>
+                            <input type="number" id="weight" step="0.01" placeholder="0,00" value="0.187">
+                        </div>
+                        <div class="form-group">
+                            <label>Dimensões (cm)</label>
+                            <input type="text" id="dimensions" placeholder="C x L x A" value="14.6 x 7.1 x 0.83">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Imagens -->
+                <div class="form-section">
+                    <h3 class="section-title">📸 Imagens do Produto</h3>
+                    
+                    <div class="image-upload" id="imageUpload" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">📁</div>
+                        <h4>Clique para fazer upload ou arraste imagens aqui</h4>
+                        <p>Recomendado: 800x800px, formato JPG/PNG, máximo 5MB</p>
+                        <p><strong>Primeira imagem será a principal</strong></p>
+                    </div>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                    
+                    <div class="image-preview" id="imagePreview">
+                        <div class="preview-item">
+                            <img src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=400&fit=crop" alt="iPhone" class="preview-img">
+                            <div class="main-image-indicator">Principal</div>
+                            <span class="preview-remove" onclick="removeImage(this)">×</span>
+                        </div>
+                        <div class="preview-item">
+                            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop" alt="iPhone 2" class="preview-img">
+                            <span class="preview-remove" onclick="removeImage(this)">×</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Atributos Personalizados -->
+                <div class="form-section">
+                    <h3 class="section-title">⚙️ Especificações Técnicas</h3>
+                    
+                    <div class="attributes-section">
+                        <div class="attribute-row">
+                            <input type="text" placeholder="Atributo" value="Tela">
+                            <input type="text" placeholder="Valor" value="6.1 polegadas Super Retina XDR">
+                            <button class="remove-attribute-btn" onclick="removeAttribute(this)">🗑️</button>
+                        </div>
+                        <div class="attribute-row">
+                            <input type="text" placeholder="Atributo" value="Processador">
+                            <input type="text" placeholder="Valor" value="Apple A17 Pro">
+                            <button class="remove-attribute-btn" onclick="removeAttribute(this)">🗑️</button>
+                        </div>
+                        <div class="attribute-row">
+                            <input type="text" placeholder="Atributo" value="Câmera">
+                            <input type="text" placeholder="Valor" value="48MP Principal + 12MP Ultra Wide">
+                            <button class="remove-attribute-btn" onclick="removeAttribute(this)">🗑️</button>
+                        </div>
+                        <button class="add-attribute-btn" onclick="addAttribute()">+ Adicionar Especificação</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Status do Produto -->
+                <div class="form-section">
+                    <h3 class="section-title">🔄 Status do Produto</h3>
+                    
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked> Disponível
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" checked> Produto em Destaque
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox"> Em Promoção
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox"> Novidade
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox"> Mais Vendido
+                        </label>
+                    </div>
+                </div>
+
+                <!-- SEO -->
+                <div class="form-section seo-section">
+                    <h3 class="section-title">🔍 SEO</h3>
+                    
+                    <div class="form-group">
+                        <label>URL do Produto</label>
+                        <input type="text" id="slug" placeholder="iphone-15-pro-128gb" value="iphone-15-pro-128gb">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Meta Título</label>
+                        <input type="text" id="metaTitle" placeholder="Título para SEO" maxlength="60">
+                        <small>0/60 caracteres</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Meta Descrição</label>
+                        <textarea id="metaDescription" placeholder="Descrição para SEO" maxlength="160"></textarea>
+                        <small>0/160 caracteres</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags SEO</label>
+                        <input type="text" id="seoTags" placeholder="iphone, apple, smartphone">
+                    </div>
+                </div>
+
+                <!-- Ações Rápidas -->
+                <div class="quick-actions">
+                    <h3>⚡ Ações Rápidas</h3>
+                    <button class="quick-action-btn" onclick="duplicateProduct()">📋 Duplicar</button>
+                    <button class="quick-action-btn" onclick="previewProduct()">👁️ Visualizar</button>
+                    <button class="quick-action-btn" onclick="exportProduct()">📤 Exportar</button>
+                    <button class="quick-action-btn" onclick="schedulePublication()">⏰ Agendar</button>
+                </div>
+
+                <!-- Promoções -->
+                <div class="form-section promotion-section">
+                    <h3 class="section-title">🎯 Promoções</h3>
+                    
+                    <div class="form-group">
+                        <label>Desconto (%)</label>
+                        <input type="number" id="discount" placeholder="0" max="100">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Início</label>
+                            <input type="date" id="promoStart">
+                        </div>
+                        <div class="form-group">
+                            <label>Fim</label>
+                            <input type="date" id="promoEnd">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estoque Avançado -->
+                <div class="form-section inventory-section">
+                    <h3 class="section-title">📊 Controle de Estoque</h3>
+                    
+                    <div class="form-group">
+                        <label>Código de Barras</label>
+                        <input type="text" id="barcode" placeholder="1234567890123">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Localização no Estoque</label>
+                        <input type="text" id="location" placeholder="A1-B2-C3">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox"> Rastrear Estoque
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox"> Permitir Backorder
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="cancelForm()">
+                    ❌ Cancelar
+                </button>
+                <button class="btn btn-success" onclick="saveDraft()">
+                    📝 Salvar Rascunho
+                </button>
+                <button class="btn btn-primary" onclick="saveProduct()">
+                    💾 Salvar Alterações
+                </button>
+                <button class="btn btn-primary" onclick="publishProduct()">
+                    🚀 Publicar Produto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Drag & Drop para imagens
+        const imageUpload = document.getElementById('imageUpload');
+        const fileInput = document.getElementById('fileInput');
+
+        imageUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUpload.classList.add('dragover');
+        });
+
+        image

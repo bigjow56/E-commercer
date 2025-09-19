@@ -47,10 +47,21 @@ export const products = pgTable("products", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   originalPrice: decimal("original_price", { precision: 10, scale: 2 }),
   categoryId: varchar("category_id").references(() => categories.id).notNull(),
-  imageUrl: text("image_url").notNull(),
+  imageUrl: text("image_url").notNull(), // Mantém para compatibilidade, será a imagem principal
   isAvailable: boolean("is_available").default(true),
   isFeatured: boolean("is_featured").default(false),
   isPromotion: boolean("is_promotion").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Tabela para múltiplas imagens de produtos
+export const productImages = pgTable("product_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productId: varchar("product_id").references(() => products.id, { onDelete: "cascade" }).notNull(),
+  imageUrl: text("image_url").notNull(),
+  altText: text("alt_text"),
+  displayOrder: integer("display_order").default(0), // Ordem de exibição
+  isMain: boolean("is_main").default(false), // Imagem principal
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -483,6 +494,11 @@ export const insertProductAttributeSchema = createInsertSchema(productAttributes
   createdAt: true,
 }).extend({
   priceModifier: z.string().or(z.number()).transform((val) => val.toString()),
+});
+
+export const insertProductImageSchema = createInsertSchema(productImages).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertBannerThemeSchema = createInsertSchema(bannerThemes).omit({

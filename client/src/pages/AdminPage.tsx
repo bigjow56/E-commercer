@@ -10,6 +10,7 @@ import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminLeads } from "@/components/admin/AdminLeads";
 import { AdminReferrals } from "@/components/admin/AdminReferrals";
 import { AdminInventory } from "@/components/admin/AdminInventory";
+import { AdminProducts } from "@/components/admin/AdminProducts";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -27,7 +28,7 @@ import {
   Package
 } from "lucide-react";
 
-type AdminSection = 'dashboard' | 'rewards' | 'points-rules' | 'tiers' | 'campaigns' | 'users' | 'leads' | 'referrals' | 'inventory';
+type AdminSection = 'dashboard' | 'products' | 'rewards' | 'points-rules' | 'tiers' | 'campaigns' | 'users' | 'leads' | 'referrals' | 'inventory';
 
 interface AdminUser {
   id: string;
@@ -74,6 +75,7 @@ export default function AdminPage() {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'products', label: 'Gerenciar Produtos', icon: Package },
     { id: 'inventory', label: 'Estoque Inteligente', icon: Package },
     { id: 'rewards', label: 'Recompensas', icon: Gift },
     { id: 'points-rules', label: 'Regras de Pontos', icon: Target },
@@ -123,6 +125,8 @@ export default function AdminPage() {
     switch (currentSection) {
       case 'dashboard':
         return <AdminDashboard />;
+      case 'products':
+        return <AdminProducts />;
       case 'inventory':
         return <AdminInventory />;
       case 'rewards':
